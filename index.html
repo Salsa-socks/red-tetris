@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Tetris</title>
+    <style>
+        body {
+            background: #202020;
+            display: flex;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 3em;
+            text-align: center;
+        }
+        
+        .player {
+            flex: 1 1 auto;
+        }
+        
+        canvas {
+            border: solid .2em #ffffff;
+            height: 90vh;
+            margin-top: 2%;
+        }
+    </style>
+</head>
+
+<body>
+    <template id="playertemplate">
+        <div class="player">
+            <div class="score"></div>
+            <canvas class="tetris" width="240" height="400"></canvas>
+        </div>
+    </template>
+
+    <script src="tetrismanager.js"></script>
+    <script src="connection-manager.js"></script>
+    <script src="arena.js"></script>
+    <script src="player.js"></script>
+    <script src="tetris.js"></script>
+    <script src="main.js"></script>
+
+</body>
+
+</html>
