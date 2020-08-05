@@ -68,9 +68,9 @@ server.on('connection', conn => {
             session.join(client);
 
             broadcast_session(session);
+        } else if (data.type === 'state-update') {
+            client.broadcast(data);
         }
-
-        console.log('Sessions ', sessions);
     });
 
     conn.on('close', () => {
