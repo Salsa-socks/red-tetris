@@ -4,6 +4,7 @@ class Player {
 
         this.drop_slow = 1000;
         this.drop_fast = 50;
+        this.events = new Events();
         this.tetris = tetris;
         this.arena = tetris.arena;
         this.dropCnt = 0;
@@ -77,7 +78,7 @@ class Player {
         if (this.arena.collide(this)) {
             this.arena.clear();
             this.score = 0;
-            this.tetris.update_score(this.score);
+            this.events.emit('score', this.score);
         }
     }
 
@@ -121,7 +122,7 @@ class Player {
             this.arena.merge(this);
             this.reset();
             this.score += this.arena.sweep();
-            this.tetris.update_score(this.score);
+            this.events.emit('score', this.score);
         }
         this.dropCnt = 0;
     }
