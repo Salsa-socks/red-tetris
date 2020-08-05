@@ -1,7 +1,9 @@
 const tetris_manager = new TetrisManager(document);
 const localtetris = tetris_manager.create_player();
-const connection_manager = new ConnectionManager();
+const connection_manager = new ConnectionManager(tetris_manager);
 connection_manager.connect("ws://localhost:9000");
+localtetris.element.classList.add('local');
+
 
 const keylistener = (event) => {
     [
