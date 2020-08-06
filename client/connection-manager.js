@@ -72,14 +72,14 @@ class ConnectionManager {
         }
     }
 
-    update_peer(id, frag, [key, prop]) {
+    update_peer(id, frag, [prop, value]) {
         if (!this.peers.has(id)) {
             console.error('Client does not exist: ', id);
             return;
         }
 
         const tetris = this.peers.get(id);
-        tetris[fragment][prop] = value;
+        tetris[frag][prop] = value;
 
         if (prop === 'score') {
             tetris.update_score(value);
