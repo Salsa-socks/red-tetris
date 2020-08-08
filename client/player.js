@@ -1,22 +1,27 @@
-class Player {
+class Player
+{
+    constructor(tetris)
+    {
+        this.DROP_SLOW = 1000;
+        this.DROP_FAST = 50;
 
-    constructor(tetris) {
+        this.events = new Events;
 
-        this.drop_slow = 1000;
-        this.drop_fast = 50;
-        this.events = new Events();
         this.tetris = tetris;
         this.arena = tetris.arena;
-        this.dropCnt = 0;
-        this.dropInterval = this.drop_slow;
-        this.pos = { x: 0, y: 0 };
+
+        this.dropCounter = 0;
+        this.dropInterval = this.DROP_SLOW;
+
+        this.pos = {x: 0, y: 0};
         this.matrix = null;
         this.score = 0;
 
         this.reset();
     }
 
-    create_piece(type) {
+    createPiece(type)
+    {
         if (type === 'T') {
             return [
                 [0, 0, 0],
@@ -62,67 +67,10 @@ class Player {
         }
     }
 
-    move(dir) {
-        this.pos.x += dir;
-        if (this.arena.collide(this)) {
-            this.pos.x -= dir;
-            return;
-        }
-        this.events.emit('pos', this.pos);
-    }
-
-    reset() {
-        const pieces = 'TOLJISZ';
-        this.matrix = this.create_piece(pieces[pieces.length * Math.random() | 0]);
-        this.pos.y = 0;
-        this.pos.x = (this.arena.matrix[0].length / 2 | 0) - (this.matrix[0].length / 2 | 0);
-
-        if (this.arena.collide(this)) {
-            this.arena.clear();
-            this.score = 0;
-            this.events.emit('score', this.score);
-        }
-        this.events.emit('pos', this.pos);
-        this.events.emit('matrix', this.matrix);
-    }
-
-    rotate(dir) {
-        const pos = this.pos.x;
-        let offset = 1;
-        this.rotate_matrix(this.matrix, dir);
-        while (this.arena.collide(this)) {
-            this.pos.x += offset;
-            offset = -(offset + (offset > 0 ? 1 : -1));
-            if (offset > this.matrix[0].length) {
-                this.rotate_matrix(this.matrix, -dir);
-                this.pos.x = pos;
-                return;
-            }
-        }
-        this.events.emit('matrix', this.matrix);
-    }
-
-    rotate_matrix(matrix, dir) {
-        for (let y = 0; y < matrix.length; ++y) {
-            for (let x = 0; x < y; ++x) {
-                [
-                    matrix[x][y], matrix[y][x],
-                ] = [
-                    matrix[y][x], matrix[x][y],
-                ];
-            }
-        }
-
-        if (dir > 0) {
-            matrix.forEach(row => row.reverse());
-        } else {
-            matrix.reverse();
-        }
-    }
-
-    drop() {
+    drop()
+    {
         this.pos.y++;
-        this.dropCnt = 0;
+        this.dropCounter = 0;
         if (this.arena.collide(this)) {
             this.pos.y--;
             this.arena.merge(this);
@@ -134,9 +82,75 @@ class Player {
         this.events.emit('pos', this.pos);
     }
 
-    update(deltatime) {
-        this.dropCnt += deltatime;
-        if (this.dropCnt > this.dropInterval) {
+    move(dir)
+    {
+        this.pos.x += dir;
+        if (this.arena.collide(this)) {
+            this.pos.x -= dir;
+            return;
+        }
+        this.events.emit('pos', this.pos);
+    }
+
+    reset()
+    {
+        const pieces = 'ILJOTSZ';
+        this.matrix = this.createPiece(pieces[pieces.length * Math.random() | 0]);
+        this.pos.y = 0;
+        this.pos.x = (this.arena.matrix[0].length / 2 | 0) -
+                     (this.matrix[0].length / 2 | 0);
+        if (this.arena.collide(this)) {
+            this.arena.clear();
+            this.score = 0;
+            this.events.emit('score', this.score);
+        }
+
+        this.events.emit('pos', this.pos);
+        this.events.emit('matrix', this.matrix);
+    }
+
+    rotate(dir)
+    {
+        const pos = this.pos.x;
+        let offset = 1;
+        this._rotateMatrix(this.matrix, dir);
+        while (this.arena.collide(this)) {
+            this.pos.x += offset;
+            offset = -(offset + (offset > 0 ? 1 : -1));
+            if (offset > this.matrix[0].length) {
+                this._rotateMatrix(this.matrix, -dir);
+                this.pos.x = pos;
+                return;
+            }
+        }
+        this.events.emit('matrix', this.matrix);
+    }
+
+    _rotateMatrix(matrix, dir)
+    {
+        for (let y = 0; y < matrix.length; ++y) {
+            for (let x = 0; x < y; ++x) {
+                [
+                    matrix[x][y],
+                    matrix[y][x],
+                ] = [
+                    matrix[y][x],
+                    matrix[x][y],
+                ];
+            }
+        }
+
+        if (dir > 0) {
+            matrix.forEach(row => row.reverse());
+        } else {
+            matrix.reverse();
+        }
+    }
+
+    update(deltaTime)
+    {
+        this.dropCounter += deltaTime;
+        if (this.dropCounter > this.dropInterval) {
             this.drop();
         }
     }

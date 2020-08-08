@@ -1,12 +1,12 @@
-const WebsocketServer = require('ws').Server;
+const WebSocketServer = require('ws').Server;
 const Session = require('./session');
 const Client = require('./client');
 
-const server = new WebsocketServer({ port: 9000 });
+const server = new WebSocketServer({port: 9000});
 
 const sessions = new Map;
 
-function create_id(len = 7, chars = 'abcdefghijklmnpqrstwxyz0123456789') {
+function createId(len = 6, chars = 'abcdefghjkmnopqrstvwxyz01234567890') {
     let id = '';
     while (len--) {
         id += chars[Math.random() * chars.length | 0];
@@ -14,67 +14,78 @@ function create_id(len = 7, chars = 'abcdefghijklmnpqrstwxyz0123456789') {
     return id;
 }
 
-function create_client(conn, id = create_id()) {
+function createClient(conn, id = createId()) {
     return new Client(conn, id);
 }
 
-function broadcast_session(session) {
-    const clients = [...session.clients];
-    clients.forEach(client => {
-        client.send({
-            type: 'session-broadcast',
-            peers: {
-                you: client.id,
-                clients: clients.map(client => client.id),
-            },
-        });
-    })
-}
-
-function create_session(id = create_id()) {
+function createSession(id = createId()) {
     if (sessions.has(id)) {
-        throw new Error('Session' + id + ' already exists.');
+        throw new Error(`Session ${id} already exists`);
     }
 
     const session = new Session(id);
-    console.log('Creating Session ', session);
+    console.log('Creating session', session);
 
     sessions.set(id, session);
 
     return session;
 }
 
-function get_session(id) {
+function getSession(id) {
     return sessions.get(id);
 }
 
+function broadcastSession(session) {
+    const clients = [...session.clients];
+    clients.forEach(client => {
+        client.send({
+            type: 'session-broadcast',
+            peers: {
+                you: client.id,
+                clients: clients.map(client => {
+                    return {
+                        id: client.id,
+                        state: client.state,
+                    }
+                }),
+            },
+        });
+    });
+}
+
 server.on('connection', conn => {
-    console.log('Connected.');
-    const client = create_client(conn);
+    console.log('Connection established');
+    const client = createClient(conn);
 
     conn.on('message', msg => {
-        console.log('MSG received:', msg);
+        console.log('Message received', msg);
         const data = JSON.parse(msg);
 
         if (data.type === 'create-session') {
-            const session = create_session();
-            session.join(client);
-            client.send({
-                type: 'session-created',
-                id: session.id
-            });
-        } else if (data.type === 'join-session') {
-            const session = get_session(data.id) || create_session(data.id);
+            const session = createSession();
             session.join(client);
 
-            broadcast_session(session);
+            client.state = data.state;
+            client.send({
+                type: 'session-created',
+                id: session.id,
+            });
+        } else if (data.type === 'join-session') {
+            const session = getSession(data.id) || createSession(data.id);
+            session.join(client);
+
+            client.state = data.state;
+            broadcastSession(session);
         } else if (data.type === 'state-update') {
+            const [key, value] = data.state;
+            client.state[data.fragment][key] = value;
             client.broadcast(data);
         }
+
     });
 
     conn.on('close', () => {
-        console.log('Connection ended.');
+        console.log('Connection closed');
         const session = client.session;
         if (session) {
             session.leave(client);
@@ -82,6 +93,9 @@ server.on('connection', conn => {
                 sessions.delete(session.id);
             }
         }
-        broadcast_session(session);
+
+        broadcastSession(session);
+
+        console.log(sessions);
     });
 });

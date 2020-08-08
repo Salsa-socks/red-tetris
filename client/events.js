@@ -1,19 +1,21 @@
-class Events {
-    constructor() {
+class Events
+{
+    constructor()
+    {
         this._listeners = new Set;
     }
-
-    listen(name, callbk) {
+    listen(name, callback)
+    {
         this._listeners.add({
             name,
-            callbk,
+            callback,
         });
     }
-
-    emit(name, ...data) {
+    emit(name, ...data)
+    {
         this._listeners.forEach(listener => {
             if (listener.name === name) {
-                listener.callbk(...data);
+                listener.callback(...data);
             }
         });
     }
