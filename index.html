@@ -4,48 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     <title>Red Tetris</title>
+
     <style>
         body {
-            background: #202020;
-            display: flex;
-            color: #ffffff;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 3em;
+            margin: 0;
+            padding: 0;
+            background: #333;
+            background-attachment: fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+        
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+        }
+        
+        article {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 10px solid rgba(255, 255, 255, 0.5);
+            margin: 10px;
+            z-index: 1;
+        }
+        
+        h1 {
+            position: absolute;
+            top: 30%;
+            width: 100%;
+            font-size: 10vh;
+            letter-spacing: 3px;
+            color: #fff;
+            font-family: Oswald, sans-serif;
             text-align: center;
         }
         
-        .player {
-            flex: 1 1 auto;
+        .black {
+            width: 500vh;
+            background-color: black;
+            height: 500vh;
+            opacity: 30%;
         }
         
-        .player.local canvas {
-            border: solid .2em #ffffff;
+        table {
+            z-index: 1;
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
         }
         
-        canvas {
-            border: solid .2em rgb(51, 22, 22);
-            height: 90vh;
-            margin-top: 2%;
+        td,
+        th {
+            border: 1px solid #dddddd;
+            color: white;
+            text-align: left;
+            padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #dddddd;
         }
     </style>
 </head>
 
 <body>
-    <template id="playertemplate">
-        <div class="player">
-            <div class="score"></div>
-            <canvas class="tetris" width="240" height="400"></canvas>
-        </div>
-    </template>
+    <article>
+        <h1>RED TETRIS<br /></h1>
+        <table>
+            <tr>
+                <table>
+                    <tr>
+                        <th>Active Games</th>
+                    </tr>
+                </table>
+            </tr>
+        </table>
+    </article>
+    <div class="black"></div>
 
-    <script src="./client/tetrismanager.js"></script>
-    <script src="./client/connection-manager.js"></script>
-    <script src="./client/arena.js"></script>
-    <script src="./client/events.js"></script>
-    <script src="./client/player.js"></script>
-    <script src="./client/tetris.js"></script>
-    <script src="./client/main.js"></script>
+    <video autoplay loop id="video-background" muted plays-inline>
+  <source src="./reference/back.mp4" type="video/mp4">
+</video>
 
 </body>
 
