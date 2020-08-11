@@ -1,7 +1,5 @@
-class ConnectionManager
-{
-    constructor(tetrisManager)
-    {
+class ConnectionManager {
+    constructor(tetrisManager) {
         this.conn = null;
         this.peers = new Map;
 
@@ -9,8 +7,7 @@ class ConnectionManager
         this.localTetris = this.tetrisManager.instances[0];
     }
 
-    connect(address)
-    {
+    connect(address) {
         this.conn = new WebSocket(address);
 
         this.conn.addEventListener('open', () => {
@@ -25,8 +22,7 @@ class ConnectionManager
         });
     }
 
-    initSession()
-    {
+    initSession() {
         const sessionId = window.location.hash.split('#')[1];
         const state = this.localTetris.serialize();
         if (sessionId) {
@@ -43,8 +39,7 @@ class ConnectionManager
         }
     }
 
-    watchEvents()
-    {
+    watchEvents() {
         const local = this.tetrisManager.instances[0];
 
         const player = local.player;
@@ -70,8 +65,7 @@ class ConnectionManager
         });
     }
 
-    updateManager(peers)
-    {
+    updateManager(peers) {
         const me = peers.you;
         const clients = peers.clients.filter(client => me !== client.id);
         clients.forEach(client => {
@@ -94,8 +88,7 @@ class ConnectionManager
         this.tetrisManager.sortPlayers(sorted);
     }
 
-    updatePeer(id, fragment, [key, value])
-    {
+    updatePeer(id, fragment, [key, value]) {
         if (!this.peers.has(id)) {
             throw new Error('Client does not exist', id);
         }
@@ -110,8 +103,7 @@ class ConnectionManager
         }
     }
 
-    receive(msg)
-    {
+    receive(msg) {
         const data = JSON.parse(msg);
         if (data.type === 'session-created') {
             window.location.hash = data.id;
@@ -122,8 +114,7 @@ class ConnectionManager
         }
     }
 
-    send(data)
-    {
+    send(data) {
         const msg = JSON.stringify(data);
         console.log('Sending message', msg);
         this.conn.send(msg);

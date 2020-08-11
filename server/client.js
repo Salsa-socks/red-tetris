@@ -38,9 +38,6 @@ class Client {
         });
     }
 
-    send_session() {
-
-    }
 }
 
 module.exports = Client;
